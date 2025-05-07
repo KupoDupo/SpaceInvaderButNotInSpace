@@ -1,3 +1,17 @@
+// TODO Essential:
+// Fix GameOver() to reset scene and empty all arrays (clear out all the sprites essentially)
+// Slow down medium ship bullet fire rate 
+// Make medium ship hitable - take 3 hits 
+// slow down player fire rate
+// pyramid spawn 3 times
+// two medium enemies, one on left one on right
+
+// TODO Optional:
+// put in background?
+// put in large ship/boss 
+// start screen/end screen - probably separate scenes
+// consumables - consume health pack for more health, consume diff bullet type 
+
 class PlanesFight extends Phaser.Scene {
 
     constructor() {
@@ -70,10 +84,11 @@ class PlanesFight extends Phaser.Scene {
         return this.my.sprite.enemies.every(enemy => !enemy.visible);
     }
 
+    // Helper Function for Enemy Fire Rate
     fireMediumEnemyBullet(x, y) {
         let enemy_bullet = this.add.sprite(x, y, "m_enbullet");
         enemy_bullet.setScale(1.0);
-        enemy_bullet.speed = 2;
+        enemy_bullet.speed = 1.5;
         this.my.sprite.enemy_bullet.push(enemy_bullet);
     }
 
