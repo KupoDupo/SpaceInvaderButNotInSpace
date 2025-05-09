@@ -1,7 +1,7 @@
 // TODO Essential:
 // Fix GameOver() to reset scene and empty all arrays (clear out all the sprites essentially)
 // Slow down medium ship bullet fire rate 
-// Make medium ship hitable - take 3 hits 
+// Make medium ship hitable - take 3 hits - collidable now but doesn't take 3 hitsd (only 1)
 // slow down player fire rate
 // pyramid spawn 3 times
 // two medium enemies, one on left one on right
@@ -11,7 +11,6 @@
 // put in large ship/boss 
 // start screen/end screen - probably separate scenes
 // consumables - consume health pack for more health, consume diff bullet type 
-
 class PlanesFight extends Phaser.Scene {
 
     constructor() {
@@ -284,6 +283,21 @@ class PlanesFight extends Phaser.Scene {
                         // enemy.x = Math.random()*config.width;
                     // }, this);
                 }
+            }
+            if (this.collides(my.sprite.medium_enemy, bullet)){ 
+                // start animation
+                this.puff = this.add.sprite(my.sprite.medium_enemy.x, my.sprite.medium_enemy.y, "whitePuff03").setScale(0.4).play("puff");
+                // clear out bullet -- put y offscreen, will get reaped next update
+                bullet.y = -100;
+                my.sprite.medium_enemy.visible = false;
+                my.sprite.medium_enemy.x = -100;
+                // Update score
+                this.myScore += my.sprite.medium_enemy.scorePoints;
+                this.updateScore();
+                // Play sound
+                this.sound.play("smallping", {
+                    volume: 1   // Can adjust volume using this, goes from 0 to 1
+                });
             }
         }
 
