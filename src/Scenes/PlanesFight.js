@@ -150,6 +150,20 @@ class PlanesFight extends Phaser.Scene {
             hideOnComplete: true
         });
 
+        // Creating a Game Over Screen - Moved to own scene but keeping here in comments in case that bugs out 
+        // this.gameOverContainer = this.add.container(game.config.width / 2, game.config.height / 2).setVisible(false);
+        // let gameOverText = this.add.bitmapText(0, 0, "rocketSquare", "GAME OVER", 32).setOrigin(0.5);
+        // this.gameOverContainer.add(gameOverText);
+        // this.scoreText = this.add.bitmapText(0, 25, "rocketSquare", "Score: 0", 24).setOrigin(0.5);
+        // this.gameOverContainer.add(this.scoreText);
+        // let resetButton = this.add.bitmapText(0, 50, "rocketSquare", "RESTART", 24)
+            // .setOrigin(0.5)
+            // .setInteractive()
+            // .on("pointerdown", () => {
+                // this.scene.restart();
+            // });
+        // this.gameOverContainer.add(resetButton);
+
         // Create key objects
         this.left = this.input.keyboard.addKey("A");
         this.right = this.input.keyboard.addKey("D");
@@ -379,6 +393,11 @@ class PlanesFight extends Phaser.Scene {
             this.spawnEnemyPyramid(newX);
         }
 
+        // If all enemies are defeated game over
+        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter >= 3 && my.sprite.medium_enemy_left.health <= 0 && my.sprite.medium_enemy.health <= 0) {
+            this.gameOver();
+        }
+
     }
 
     // A center-radius AABB collision check
@@ -407,8 +426,6 @@ class PlanesFight extends Phaser.Scene {
         }
         this.my.sprite.health = [];
 
-        this.myScore = 0;
-
         this.spawnCounter = 0;
 
         if (this.my.sprite.medium_enemy) {
@@ -419,9 +436,11 @@ class PlanesFight extends Phaser.Scene {
             this.my.sprite.medium_enemy_left.health = 3;
         }
 
-        this.time.delayedCall(100, () => {
-            this.scene.restart();
-        }); // apparently you need to give some time for cleanup logic to complete 
+        // this.scoreText.setText("Score: " + this.myScore);
+        // this.gameOverContainer.setVisible(true);
+        this.scene.start("gameOver", { score: this.myScore });
+
+        this.myScore = 0;
     }
 
 }
