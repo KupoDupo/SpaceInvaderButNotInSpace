@@ -249,6 +249,7 @@ class PlanesLevel2 extends Phaser.Scene {
             if (my.sprite.large_enemy.y > game.config.height) {
                 my.sprite.large_enemy.visible = false;
                 my.sprite.large_enemy.destroy();
+                my.sprite.large_enemy.health = 0;
 
                 if (my.sprite.health.length > 0) {
                     let lostHealth = my.sprite.health.pop();
@@ -284,6 +285,8 @@ class PlanesLevel2 extends Phaser.Scene {
             if (my.sprite.large_enemy2.y > game.config.height) {
                 my.sprite.large_enemy2.visible = false;
                 my.sprite.large_enemy2.destroy();
+                my.sprite.large_enemy2.health = 0;
+
 
                 if (my.sprite.health.length > 0) {
                     let lostHealth = my.sprite.health.pop();
