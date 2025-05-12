@@ -1,6 +1,6 @@
 class GameOverScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'gameOver' });
+    super('gameOver');
   }
 
   create(data) {
@@ -17,7 +17,7 @@ class GameOverScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive()
             .on("pointerdown", () => {
-                this.scene.start("planesFight"); // Restart the gameplay scene
+                this.scene.start("startGame"); // Restart the gameplay scene
             });
     }
 }

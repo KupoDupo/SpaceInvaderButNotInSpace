@@ -20,7 +20,7 @@ let config = {
     fps: { forceSetTimeOut: true, target: 60 },   // ensure consistent timing across machines
     width: 800,
     height: 600,
-    scene: [StartScreen, PlanesFight, GameOverScene]
+    scene: [StartScreen, PlanesFight, PlanesLevel2, PlanesLevel3, WinScreen, GameOverScene]
 }
 
 

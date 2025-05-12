@@ -1,20 +1,7 @@
-// TODO Essential:
-// DONE: Fix GameOver() to reset scene and empty all arrays (clear out all the sprites essentially)
-// DONE: Slow down medium ship bullet fire rate 
-// DONE: Make medium ship hitable - take 3 hits - collidable now but doesn't take 3 hitsd (only 1)
-// slow down player fire rate
-// DONE: pyramid spawn 3 times
-// DONE: two medium enemies, one on left one on right
-
-// TODO Optional:
-// put in background?
-// put in large ship/boss 
-// start screen/end screen - probably separate scenes
-// consumables - consume health pack for more health, consume diff bullet type 
-class PlanesFight extends Phaser.Scene {
+class PlanesLevel2 extends Phaser.Scene {
 
     constructor() {
-        super("planesFight");
+        super("level2");
 
         this.my = {sprite: {}, text: {}};
    
@@ -22,8 +9,7 @@ class PlanesFight extends Phaser.Scene {
         
         this.maxEnemyBullets = 20;
 
-        this.myScore = 0;       // record a score as a class variable
-        // More typically want to use a global variable for score to use across multiple Scenes but okay here
+        this.myScore = 700;       // score from last level - should probably store/pass this but if it works it works
     }
 
     preload() {
@@ -34,6 +20,8 @@ class PlanesFight extends Phaser.Scene {
         this.load.image("m_enbullet", "enemy_small_bullet.png");
         this.load.image("m_enemy", "medenemy.png");
         this.load.image("health", "health.png");
+        this.load.image("large", "large_ship.png");
+        this.load.image("large_bullet", "largebullet.png");
 
         // For animation
         this.load.image("whitePuff00", "whitePuff00.png");
@@ -87,6 +75,13 @@ class PlanesFight extends Phaser.Scene {
         this.my.sprite.enemy_bullet.push(enemy_bullet);
     }
 
+    fireLargeEnemyBullet(x, y) {
+        let large_bullet = this.add.sprite(x, y, "large_bullet");
+        large_bullet.setScale(1.5);
+        large_bullet.speed = 1.5;
+        this.my.sprite.enemy_bullet.push(large_bullet);
+    }
+
     create() {
         let my = this.my;
 
@@ -97,14 +92,14 @@ class PlanesFight extends Phaser.Scene {
 
         //player firing rate 
         this.bulletFired = 0;
-        this.fireRate = 500;
+        this.fireRate = 700; // upgrading firing rate for next levels
 
         my.sprite.player = this.add.sprite(game.config.width/2, game.config.height - 40, "player");
         my.sprite.player.setScale(2.0);
 
         this.spawnEnemyPyramid();
 
-        my.sprite.medium_enemy = this.add.sprite(game.config.width/2, 80, "m_enemy");
+        my.sprite.medium_enemy = this.add.sprite(game.config.width/3, 80, "m_enemy");
         my.sprite.medium_enemy.scorePoints = 50;
         my.sprite.medium_enemy.setScale(2.0);
         my.sprite.medium_enemy.setFlipY(true);
@@ -113,21 +108,31 @@ class PlanesFight extends Phaser.Scene {
         my.sprite.medium_enemy.lastFired = 0;
         my.sprite.medium_enemy.health = 3;
 
-        my.sprite.medium_enemy_left = this.add.sprite(100, 80, "m_enemy");
-        my.sprite.medium_enemy_left.scorePoints = 50;
-        my.sprite.medium_enemy_left.setScale(2.0);
-        my.sprite.medium_enemy_left.setFlipY(true);
-        my.sprite.medium_enemy_left.direction = 1;
-        my.sprite.medium_enemy_left.speed = 1;
-        my.sprite.medium_enemy_left.lastFired = 0;
-        my.sprite.medium_enemy_left.health = 3;
+        // large enemy stuffs
+        my.sprite.large_enemy = this.add.sprite(3 * game.config.width/4, 80, "large");
+        my.sprite.large_enemy.scorePoints = 100;
+        my.sprite.large_enemy.setScale(2.5);
+        my.sprite.large_enemy.setFlipY(true);
+        my.sprite.large_enemy.direction = 1;
+        my.sprite.large_enemy.speed = 0.5;
+        my.sprite.large_enemy.lastFired = 0;
+        my.sprite.large_enemy.health = 5;
+
+        my.sprite.large_enemy2 = this.add.sprite(game.config.width/4, 80, "large");
+        my.sprite.large_enemy2.scorePoints = 100;
+        my.sprite.large_enemy2.setScale(2.5);
+        my.sprite.large_enemy2.setFlipY(true);
+        my.sprite.large_enemy2.direction = 1;
+        my.sprite.large_enemy2.speed = 0.5;
+        my.sprite.large_enemy2.lastFired = 0;
+        my.sprite.large_enemy2.health = 5;
 
         // I know I probably could've done the set path stuff we went over but this seemed more precise
         this.time.addEvent({
             delay: 2000, // 2 seconds, 1000 = 1 second, measured in ms (convert to s for human eyes lol)
             callback: () => {
                 my.sprite.medium_enemy.direction *= -1;
-                my.sprite.medium_enemy_left.direction *= -1;
+                // my.sprite.medium_enemy_left.direction *= -1;
             },
             loop: true // Loops the event (repeat)
         });
@@ -152,20 +157,6 @@ class PlanesFight extends Phaser.Scene {
             repeat: 5,
             hideOnComplete: true
         });
-
-        // Creating a Game Over Screen - Moved to own scene but keeping here in comments in case that bugs out 
-        // this.gameOverContainer = this.add.container(game.config.width / 2, game.config.height / 2).setVisible(false);
-        // let gameOverText = this.add.bitmapText(0, 0, "rocketSquare", "GAME OVER", 32).setOrigin(0.5);
-        // this.gameOverContainer.add(gameOverText);
-        // this.scoreText = this.add.bitmapText(0, 25, "rocketSquare", "Score: 0", 24).setOrigin(0.5);
-        // this.gameOverContainer.add(this.scoreText);
-        // let resetButton = this.add.bitmapText(0, 50, "rocketSquare", "RESTART", 24)
-            // .setOrigin(0.5)
-            // .setInteractive()
-            // .on("pointerdown", () => {
-                // this.scene.restart();
-            // });
-        // this.gameOverContainer.add(resetButton);
 
         // Create key objects
         this.left = this.input.keyboard.addKey("A");
@@ -241,30 +232,81 @@ class PlanesFight extends Phaser.Scene {
             }
         }
 
-        if (my.sprite.medium_enemy_left.visible) {
-            my.sprite.medium_enemy_left.x += my.sprite.medium_enemy_left.direction * my.sprite.medium_enemy_left.speed;
-
-            // Boundary Checking for Medium Enemy
-            if (my.sprite.medium_enemy_left.x <= my.sprite.medium_enemy_left.displayWidth / 2) {
-                my.sprite.medium_enemy_left.x = my.sprite.medium_enemy_left.displayWidth / 2;
-                my.sprite.medium_enemy_left.direction = 1; // Force direction to right
+        if (my.sprite.large_enemy.visible) {
+            if (!my.sprite.large_enemy.time) {
+                my.sprite.large_enemy.time = 0;
             }
-            if (my.sprite.medium_enemy_left.x >= game.config.width - my.sprite.medium_enemy_left.displayWidth / 2) {
-                my.sprite.medium_enemy_left.x = game.config.width - my.sprite.medium_enemy_left.displayWidth / 2;
-                my.sprite.medium_enemy_left.direction = -1; // Force direction to left
+            my.sprite.large_enemy.time += 0.2;
+
+            let amplitude = 150;
+            let frequency = 0.2;
+            my.sprite.large_enemy.x = game.config.width/4 + amplitude * Math.sin(my.sprite.large_enemy.time * frequency);
+            my.sprite.large_enemy.y += my.sprite.large_enemy.speed;
+
+            if (my.sprite.large_enemy.y > game.config.height) {
+                my.sprite.large_enemy.visible = false;
+                my.sprite.large_enemy.destroy();
+
+                if (my.sprite.health.length > 0) {
+                    let lostHealth = my.sprite.health.pop();
+                    this.sound.play("damage", {
+                        volume: 1   
+                    });
+                    lostHealth.destroy();
+                }
+
+                if (my.sprite.health.length === 0) {
+                    this.gameOver();
+                }
             }
 
             let currentTime = this.time.now;
-            if (currentTime - my.sprite.medium_enemy_left.lastFired > 3000) {
-                this.fireMediumEnemyBullet(my.sprite.medium_enemy_left.x, my.sprite.medium_enemy_left.y);
-                my.sprite.medium_enemy_left.lastFired = currentTime;
+            if (currentTime - my.sprite.large_enemy.lastFired > 1500) {
+                this.fireLargeEnemyBullet(my.sprite.large_enemy.x, my.sprite.large_enemy.y);
+                my.sprite.large_enemy.lastFired = currentTime;
             }
         }
+
+        if (my.sprite.large_enemy2.visible) {
+            if (!my.sprite.large_enemy2.time) {
+                my.sprite.large_enemy2.time = 0;
+            }
+            my.sprite.large_enemy2.time += 0.2;
+
+            let amplitude = 150;
+            let frequency = 0.2;
+            my.sprite.large_enemy2.x = 3 * game.config.width/4 + amplitude * Math.sin(my.sprite.large_enemy2.time * frequency);
+            my.sprite.large_enemy2.y += my.sprite.large_enemy2.speed;
+
+            if (my.sprite.large_enemy2.y > game.config.height) {
+                my.sprite.large_enemy2.visible = false;
+                my.sprite.large_enemy2.destroy();
+
+                if (my.sprite.health.length > 0) {
+                    let lostHealth = my.sprite.health.pop();
+                    this.sound.play("damage", {
+                        volume: 1 
+                    });
+                    lostHealth.destroy();
+                }
+
+                if (my.sprite.health.length === 0) {
+                    this.gameOver();
+                }
+            }
+
+            let currentTime = this.time.now;
+            if (currentTime - my.sprite.large_enemy2.lastFired > 1500) {
+                this.fireLargeEnemyBullet(my.sprite.large_enemy2.x, my.sprite.large_enemy2.y);
+                my.sprite.large_enemy2.lastFired = currentTime;
+            }
+        }
+
 
         // Move small enemy pyramid forward
         for (let enemy of my.sprite.enemies) {
             if (enemy.visible) {
-                enemy.y += 1; // Adjust the speed as needed
+                enemy.y += 1;
 
                 if (enemy.y > game.config.height) {
                     enemy.visible = false;
@@ -364,21 +406,44 @@ class PlanesFight extends Phaser.Scene {
                 }
             }
 
-            if (this.collides(my.sprite.medium_enemy_left, bullet)){ 
+            if (this.collides(my.sprite.large_enemy, bullet)){ 
                 this.sound.play("smallping", {
                     volume: 0.8
                 });
                 // clear out bullet -- put y offscreen, will get reaped next update
                 bullet.y = -100;
 
-                my.sprite.medium_enemy_left.health -= 1; 
-                if (my.sprite.medium_enemy_left.health <= 0) {
-                    this.puff = this.add.sprite(my.sprite.medium_enemy_left.x, my.sprite.medium_enemy_left.y, "whitePuff03").setScale(0.4).play("puff");
-                    my.sprite.medium_enemy_left.visible = false;
-                    my.sprite.medium_enemy_left.x = -100;
+                my.sprite.large_enemy.health -= 1; 
+                if (my.sprite.large_enemy.health <= 0) {
+                    this.puff = this.add.sprite(my.sprite.large_enemy.x, my.sprite.large_enemy.y, "whitePuff03").setScale(0.6).play("puff");
+                    my.sprite.large_enemy.visible = false;
+                    my.sprite.large_enemy.x = -100;
                 
                     // Update score
-                    this.myScore += my.sprite.medium_enemy_left.scorePoints;
+                    this.myScore += my.sprite.large_enemy.scorePoints;
+                    this.updateScore();
+                    // Play sound
+                    this.sound.play("smallping", {
+                        volume: 1   // Can adjust volume using this, goes from 0 to 1
+                    });
+                }
+            }
+
+            if (this.collides(my.sprite.large_enemy2, bullet)){ 
+                this.sound.play("smallping", {
+                    volume: 0.8
+                });
+                // clear out bullet -- put y offscreen, will get reaped next update
+                bullet.y = -100;
+
+                my.sprite.large_enemy2.health -= 1; 
+                if (my.sprite.large_enemy2.health <= 0) {
+                    this.puff = this.add.sprite(my.sprite.large_enemy2.x, my.sprite.large_enemy2.y, "whitePuff03").setScale(0.6).play("puff");
+                    my.sprite.large_enemy2.visible = false;
+                    my.sprite.large_enemy2.x = -100;
+                
+                    // Update score
+                    this.myScore += my.sprite.large_enemy2.scorePoints;
                     this.updateScore();
                     // Play sound
                     this.sound.play("smallping", {
@@ -393,14 +458,14 @@ class PlanesFight extends Phaser.Scene {
             bullet.y -= this.bulletSpeed;
         }
 
-        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter < 3) {
+        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter < 2) {
             this.spawnCounter += 1; // Increment the spawn counter
             let newX = Phaser.Math.Between(50, 150); // Random X start
             this.spawnEnemyPyramid(newX);
         }
 
         // If all enemies are defeated next level
-        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter >= 3 && my.sprite.medium_enemy_left.health <= 0 && my.sprite.medium_enemy.health <= 0) {
+        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter >= 2 && my.sprite.medium_enemy.health <= 0 && my.sprite.large_enemy.health <= 0 && my.sprite.large_enemy2.health <= 0) {
             this.nextLevel();
         }
 
@@ -419,7 +484,7 @@ class PlanesFight extends Phaser.Scene {
     }
 
     nextLevel() {
-        this.scene.start("level2");
+        this.scene.start("level3");
     }
 
     gameOver() {
@@ -442,16 +507,10 @@ class PlanesFight extends Phaser.Scene {
             this.my.sprite.medium_enemy.health = 3;
         }
 
-        if (this.my.sprite.medium_enemy_left) {
-            this.my.sprite.medium_enemy_left.health = 3;
-        }
-
-        // this.scoreText.setText("Score: " + this.myScore);
-        // this.gameOverContainer.setVisible(true);
         this.scene.start("gameOver", { score: this.myScore });
 
         this.myScore = 0;
     }
 
 }
-         
+      

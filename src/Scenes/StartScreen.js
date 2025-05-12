@@ -1,6 +1,6 @@
 class StartScreen extends Phaser.Scene {
   constructor() {
-    super({ key: 'startGame' });
+    super('startGame');
   }
 
   preload() {
@@ -23,7 +23,7 @@ class StartScreen extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive()
             .on("pointerdown", () => {
-                this.scene.start("planesFight"); // Restart the gameplay scene
+                this.scene.start("level3"); // Restart the gameplay scene
             });
     }
 }
