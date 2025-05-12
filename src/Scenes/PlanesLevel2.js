@@ -92,7 +92,7 @@ class PlanesLevel2 extends Phaser.Scene {
 
         //player firing rate 
         this.bulletFired = 0;
-        this.fireRate = 700; // upgrading firing rate for next levels
+        this.fireRate = 350; // upgrading firing rate for next levels
 
         my.sprite.player = this.add.sprite(game.config.width/2, game.config.height - 40, "player");
         my.sprite.player.setScale(2.0);
@@ -114,7 +114,7 @@ class PlanesLevel2 extends Phaser.Scene {
         my.sprite.large_enemy.setScale(2.5);
         my.sprite.large_enemy.setFlipY(true);
         my.sprite.large_enemy.direction = 1;
-        my.sprite.large_enemy.speed = 0.5;
+        my.sprite.large_enemy.speed = 0.3;
         my.sprite.large_enemy.lastFired = 0;
         my.sprite.large_enemy.health = 5;
 
@@ -123,7 +123,7 @@ class PlanesLevel2 extends Phaser.Scene {
         my.sprite.large_enemy2.setScale(2.5);
         my.sprite.large_enemy2.setFlipY(true);
         my.sprite.large_enemy2.direction = 1;
-        my.sprite.large_enemy2.speed = 0.5;
+        my.sprite.large_enemy2.speed = 0.3;
         my.sprite.large_enemy2.lastFired = 0;
         my.sprite.large_enemy2.health = 5;
 
@@ -261,7 +261,7 @@ class PlanesLevel2 extends Phaser.Scene {
             }
 
             let currentTime = this.time.now;
-            if (currentTime - my.sprite.large_enemy.lastFired > 1500) {
+            if (currentTime - my.sprite.large_enemy.lastFired > 2000) {
                 this.fireLargeEnemyBullet(my.sprite.large_enemy.x, my.sprite.large_enemy.y);
                 my.sprite.large_enemy.lastFired = currentTime;
             }
@@ -296,7 +296,7 @@ class PlanesLevel2 extends Phaser.Scene {
             }
 
             let currentTime = this.time.now;
-            if (currentTime - my.sprite.large_enemy2.lastFired > 1500) {
+            if (currentTime - my.sprite.large_enemy2.lastFired > 2000) {
                 this.fireLargeEnemyBullet(my.sprite.large_enemy2.x, my.sprite.large_enemy2.y);
                 my.sprite.large_enemy2.lastFired = currentTime;
             }

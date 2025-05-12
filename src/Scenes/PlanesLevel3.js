@@ -23,6 +23,7 @@ class PlanesLevel3 extends Phaser.Scene {
         this.load.image("large", "large_ship.png");
         this.load.image("large_bullet", "largebullet.png");
         this.load.image("boss", "boss.png");
+        this.load.image("BB", "bossbullet.png");
 
         // For animation
         this.load.image("whitePuff00", "whitePuff00.png");
@@ -83,6 +84,13 @@ class PlanesLevel3 extends Phaser.Scene {
         this.my.sprite.enemy_bullet.push(large_bullet);
     }
 
+    fireTheBoss(x, y) {
+        let boss_bullet = this.add.sprite(x, y, "BB");
+        boss_bullet.setScale(2.0);
+        boss_bullet.speed = 1.5;
+        this.my.sprite.enemy_bullet.push(boss_bullet);
+    }
+
     create() {
         let my = this.my;
 
@@ -93,14 +101,24 @@ class PlanesLevel3 extends Phaser.Scene {
 
         //player firing rate 
         this.bulletFired = 0;
-        this.fireRate = 700; // upgrading firing rate for next levels
+        this.fireRate = 300; // upgrading firing rate for next levels
 
         my.sprite.player = this.add.sprite(game.config.width/2, game.config.height - 40, "player");
         my.sprite.player.setScale(2.0);
 
+        // DA BOSS
+        my.sprite.boss = this.add.sprite(game.config.width/2, 25, "boss");
+        my.sprite.boss.scorePoints = 1000;
+        my.sprite.boss.setScale(15.0);
+        my.sprite.boss.setFlipY(true);
+        my.sprite.boss.lastFired = 0;
+        my.sprite.boss.health = 50;
+
+        // phase 1!
         this.spawnEnemyPyramid();
 
-        my.sprite.medium_enemy = this.add.sprite(game.config.width/3, 80, "m_enemy");
+        // medium enemies for phase 2
+        my.sprite.medium_enemy = this.add.sprite(game.config.width/2, game.config.width/3 , "m_enemy");
         my.sprite.medium_enemy.scorePoints = 50;
         my.sprite.medium_enemy.setScale(2.0);
         my.sprite.medium_enemy.setFlipY(true);
@@ -108,9 +126,20 @@ class PlanesLevel3 extends Phaser.Scene {
         my.sprite.medium_enemy.speed = 1;
         my.sprite.medium_enemy.lastFired = 0;
         my.sprite.medium_enemy.health = 3;
+        my.sprite.medium_enemy.visible = false;
 
-        // large enemy stuffs
-        my.sprite.large_enemy = this.add.sprite(3 * game.config.width/4, 80, "large");
+        my.sprite.medium_enemy_left = this.add.sprite(100, game.config.width/3, "m_enemy");
+        my.sprite.medium_enemy_left.scorePoints = 50;
+        my.sprite.medium_enemy_left.setScale(2.0);
+        my.sprite.medium_enemy_left.setFlipY(true);
+        my.sprite.medium_enemy_left.direction = 1;
+        my.sprite.medium_enemy_left.speed = 1;
+        my.sprite.medium_enemy_left.lastFired = 0;
+        my.sprite.medium_enemy_left.health = 3;
+        my.sprite.medium_enemy_left.visible = false;
+
+        // large enemies for phase 3
+        my.sprite.large_enemy = this.add.sprite(0.75 * game.config.width, 80, "large");
         my.sprite.large_enemy.scorePoints = 100;
         my.sprite.large_enemy.setScale(2.5);
         my.sprite.large_enemy.setFlipY(true);
@@ -118,8 +147,9 @@ class PlanesLevel3 extends Phaser.Scene {
         my.sprite.large_enemy.speed = 0.5;
         my.sprite.large_enemy.lastFired = 0;
         my.sprite.large_enemy.health = 5;
+        my.sprite.large_enemy.visible = false;
 
-        my.sprite.large_enemy2 = this.add.sprite(game.config.width/4, 80, "large");
+        my.sprite.large_enemy2 = this.add.sprite( 0.25 * game.config.width, 80, "large");
         my.sprite.large_enemy2.scorePoints = 100;
         my.sprite.large_enemy2.setScale(2.5);
         my.sprite.large_enemy2.setFlipY(true);
@@ -127,6 +157,7 @@ class PlanesLevel3 extends Phaser.Scene {
         my.sprite.large_enemy2.speed = 0.5;
         my.sprite.large_enemy2.lastFired = 0;
         my.sprite.large_enemy2.health = 5;
+        my.sprite.large_enemy2.visible = false;
 
         // I know I probably could've done the set path stuff we went over but this seemed more precise
         this.time.addEvent({
@@ -165,9 +196,6 @@ class PlanesLevel3 extends Phaser.Scene {
         //this.nextScene = this.input.keyboard.addKey("S");
         this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        // For small pyramid spawn
-        this.spawnCounter = 0;
-
         // Set movement speeds (in pixels/tick)
         this.playerSpeed = 5;
         this.bulletSpeed = 5;
@@ -181,6 +209,35 @@ class PlanesLevel3 extends Phaser.Scene {
 
     update() {
         let my = this.my;
+
+        // commence phase 2
+        if (my.sprite.boss.health > 30 && my.sprite.boss.health <= 40) {
+            if (my.sprite.medium_enemy.health > 0) {
+                my.sprite.medium_enemy.visible = true;
+            }
+            if (my.sprite.medium_enemy_left.health > 0) {
+                my.sprite.medium_enemy_left.visible = true;
+            }
+        }
+
+        // commence phase 3
+        if (my.sprite.boss.health > 20 && my.sprite.boss.health <= 30) {
+            if (my.sprite.large_enemy.health > 0) {
+                my.sprite.large_enemy.visible = true;
+            }
+            if (my.sprite.large_enemy2.health > 0) {
+                my.sprite.large_enemy2.visible = true;
+            }
+        }
+
+        // phase 4 boss bullets 
+        if (my.sprite.boss.health > 0 && my.sprite.boss.health <= 20) {
+            let currentTime = this.time.now;
+            if (currentTime - my.sprite.boss.lastFired > 3000) {
+                this.fireTheBoss(Phaser.Math.Between(50, 150), my.sprite.boss.y);
+                my.sprite.boss.lastFired = currentTime;
+            }
+        }
 
         // Move enemy bullets downward
         for (let bullet of my.sprite.enemy_bullet) {
@@ -233,6 +290,26 @@ class PlanesLevel3 extends Phaser.Scene {
             }
         }
 
+        if (my.sprite.medium_enemy_left.visible) {
+            my.sprite.medium_enemy_left.x += my.sprite.medium_enemy_left.direction * my.sprite.medium_enemy_left.speed;
+
+            // Boundary Checking for Medium Enemy
+            if (my.sprite.medium_enemy_left.x <= my.sprite.medium_enemy_left.displayWidth / 2) {
+                my.sprite.medium_enemy_left.x = my.sprite.medium_enemy_left.displayWidth / 2;
+                my.sprite.medium_enemy_left.direction = 1; // Force direction to right
+            }
+            if (my.sprite.medium_enemy_left.x >= game.config.width - my.sprite.medium_enemy_left.displayWidth / 2) {
+                my.sprite.medium_enemy_left.x = game.config.width - my.sprite.medium_enemy_left.displayWidth / 2;
+                my.sprite.medium_enemy_left.direction = -1; // Force direction to left
+            }
+
+            let currentTime = this.time.now;
+            if (currentTime - my.sprite.medium_enemy_left.lastFired > 3000) {
+                this.fireMediumEnemyBullet(my.sprite.medium_enemy_left.x, my.sprite.medium_enemy_left.y);
+                my.sprite.medium_enemy_left.lastFired = currentTime;
+            }
+        }
+
         if (my.sprite.large_enemy.visible) {
             if (!my.sprite.large_enemy.time) {
                 my.sprite.large_enemy.time = 0;
@@ -262,7 +339,7 @@ class PlanesLevel3 extends Phaser.Scene {
             }
 
             let currentTime = this.time.now;
-            if (currentTime - my.sprite.large_enemy.lastFired > 1500) {
+            if (currentTime - my.sprite.large_enemy.lastFired > 2000) {
                 this.fireLargeEnemyBullet(my.sprite.large_enemy.x, my.sprite.large_enemy.y);
                 my.sprite.large_enemy.lastFired = currentTime;
             }
@@ -297,12 +374,11 @@ class PlanesLevel3 extends Phaser.Scene {
             }
 
             let currentTime = this.time.now;
-            if (currentTime - my.sprite.large_enemy2.lastFired > 1500) {
+            if (currentTime - my.sprite.large_enemy2.lastFired > 2000) {
                 this.fireLargeEnemyBullet(my.sprite.large_enemy2.x, my.sprite.large_enemy2.y);
                 my.sprite.large_enemy2.lastFired = currentTime;
             }
         }
-
 
         // Move small enemy pyramid forward
         for (let enemy of my.sprite.enemies) {
@@ -377,13 +453,9 @@ class PlanesLevel3 extends Phaser.Scene {
                     this.sound.play("smallping", {
                         volume: 1   // Can adjust volume using this, goes from 0 to 1
                     });
-                    // this.puff.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-                        // enemy.visible = true;
-                        // enemy.x = Math.random()*config.width;
-                    // }, this);
                 }
             }
-            if (this.collides(my.sprite.medium_enemy, bullet)){ 
+            if (this.collides(my.sprite.medium_enemy, bullet) && my.sprite.medium_enemy.visible){ 
                 this.sound.play("smallping", {
                     volume: 0.8
                 }); // hit sound but lower volume so players know they hit it but plane not down yet 
@@ -407,7 +479,31 @@ class PlanesLevel3 extends Phaser.Scene {
                 }
             }
 
-            if (this.collides(my.sprite.large_enemy, bullet)){ 
+            if (this.collides(my.sprite.medium_enemy_left, bullet) && my.sprite.medium_enemy_left.visible){ 
+                this.sound.play("smallping", {
+                    volume: 0.8
+                }); // hit sound but lower volume so players know they hit it but plane not down yet 
+                
+                // clear out bullet -- put y offscreen, will get reaped next update
+                bullet.y = -100;
+
+                my.sprite.medium_enemy_left.health -= 1; 
+                if (my.sprite.medium_enemy_left.health <= 0) {
+                    this.puff = this.add.sprite(my.sprite.medium_enemy_left.x, my.sprite.medium_enemy_left.y, "whitePuff03").setScale(0.4).play("puff");
+                    my.sprite.medium_enemy_left.visible = false;
+                    my.sprite.medium_enemy_left.x = -100;
+                
+                    // Update score
+                    this.myScore += my.sprite.medium_enemy_left.scorePoints;
+                    this.updateScore();
+                    // Play sound
+                    this.sound.play("smallping", {
+                        volume: 1   // Can adjust volume using this, goes from 0 to 1
+                    });
+                }
+            }
+
+            if (this.collides(my.sprite.large_enemy, bullet) && my.sprite.large_enemy.visible){ 
                 this.sound.play("smallping", {
                     volume: 0.8
                 });
@@ -430,7 +526,7 @@ class PlanesLevel3 extends Phaser.Scene {
                 }
             }
 
-            if (this.collides(my.sprite.large_enemy2, bullet)){ 
+            if (this.collides(my.sprite.large_enemy2, bullet) && my.sprite.large_enemy2.visible){ 
                 this.sound.play("smallping", {
                     volume: 0.8
                 });
@@ -452,6 +548,32 @@ class PlanesLevel3 extends Phaser.Scene {
                     });
                 }
             }
+
+            if (this.collides(my.sprite.boss, bullet)){ 
+                this.sound.play("smallping", {
+                    volume: 0.8
+                });
+                // clear out bullet -- put y offscreen, will get reaped next update
+                bullet.y = -100;
+
+                my.sprite.boss.health -= 1; 
+                if (my.sprite.boss.health <= 0) {
+                    this.puff = this.add.sprite(130, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
+                    this.puff = this.add.sprite(200, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
+                    this.puff = this.add.sprite(250, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
+
+                    my.sprite.boss.visible = false;
+                    my.sprite.boss.x = -200;
+                
+                    // Update score
+                    this.myScore += my.sprite.boss.scorePoints;
+                    this.updateScore();
+                    // Play sound
+                    this.sound.play("smallping", {
+                        volume: 1   // Can adjust volume using this, goes from 0 to 1
+                    });
+                }
+            }
         }
 
         // Make all of the bullets move
@@ -459,14 +581,13 @@ class PlanesLevel3 extends Phaser.Scene {
             bullet.y -= this.bulletSpeed;
         }
 
-        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter < 2) {
-            this.spawnCounter += 1; // Increment the spawn counter
+        if (this.areAllSmallEnemiesDefeated() && my.sprite.boss.health > 40) {
             let newX = Phaser.Math.Between(50, 150); // Random X start
             this.spawnEnemyPyramid(newX);
         }
 
         // If all enemies are defeated next level
-        if (this.areAllSmallEnemiesDefeated() && this.spawnCounter >= 2 && my.sprite.medium_enemy.health <= 0 && my.sprite.large_enemy.health <= 0 && my.sprite.large_enemy2.health <= 0) {
+        if (this.areAllSmallEnemiesDefeated() && my.sprite.medium_enemy.health <= 0 && my.sprite.medium_enemy_left.health <= 0 && my.sprite.large_enemy.health <= 0 && my.sprite.large_enemy2.health <= 0 && my.sprite.boss.health <= 0) {
             this.winScreen();
         }
 

@@ -2,14 +2,14 @@
 // DONE: Fix GameOver() to reset scene and empty all arrays (clear out all the sprites essentially)
 // DONE: Slow down medium ship bullet fire rate 
 // DONE: Make medium ship hitable - take 3 hits - collidable now but doesn't take 3 hitsd (only 1)
-// slow down player fire rate
+// DONE: slow down player fire rate
 // DONE: pyramid spawn 3 times
 // DONE: two medium enemies, one on left one on right
 
 // TODO Optional:
 // put in background?
-// put in large ship/boss 
-// start screen/end screen - probably separate scenes
+// DONE: put in large ship/boss 
+// DONE: start screen/end screen - probably separate scenes
 // consumables - consume health pack for more health, consume diff bullet type 
 class PlanesFight extends Phaser.Scene {
 
