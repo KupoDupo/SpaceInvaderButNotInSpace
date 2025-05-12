@@ -17,7 +17,8 @@ class GameOverScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setInteractive()
             .on("pointerdown", () => {
-                this.scene.start("startGame"); // Restart the gameplay scene
+                this.scene.start("startGame"); 
+                this.myScore = 0;
             });
     }
 }

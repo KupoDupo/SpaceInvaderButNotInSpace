@@ -24,6 +24,7 @@ class WinScreen extends Phaser.Scene {
             .setInteractive()
             .on("pointerdown", () => {
                 this.scene.start("startGame"); // Restart the gameplay scene
+                this.myScore = 0;
             });
     }
 }

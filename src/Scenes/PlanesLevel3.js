@@ -9,7 +9,10 @@ class PlanesLevel3 extends Phaser.Scene {
         
         this.maxEnemyBullets = 20;
 
-        this.myScore = 1550; 
+    }
+
+    init(data) {
+        this.myScore = data.score || 0;;
     }
 
     preload() {
@@ -201,7 +204,7 @@ class PlanesLevel3 extends Phaser.Scene {
         this.bulletSpeed = 5;
 
         // update HTML description
-        document.getElementById('description').innerHTML = '<h2>Planes Invader.js</h2><br>A: left // D: right // Space: fire/emit'
+        document.getElementById('description').innerHTML = '<h2>Level 3</h2><br>A: left // D: right // Space: fire/emit'
         // Put score on screen
         my.text.score = this.add.bitmapText(550, 0, "rocketSquare", "Score " + this.myScore);
 
@@ -559,8 +562,8 @@ class PlanesLevel3 extends Phaser.Scene {
                 my.sprite.boss.health -= 1; 
                 if (my.sprite.boss.health <= 0) {
                     this.puff = this.add.sprite(130, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
-                    this.puff = this.add.sprite(200, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
-                    this.puff = this.add.sprite(250, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
+                    this.puff = this.add.sprite(300, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
+                    this.puff = this.add.sprite(500, my.sprite.boss.y, "whitePuff03").setScale(0.6).play("puff");
 
                     my.sprite.boss.visible = false;
                     my.sprite.boss.x = -200;
@@ -630,8 +633,6 @@ class PlanesLevel3 extends Phaser.Scene {
         }
 
         this.scene.start("gameOver", { score: this.myScore });
-
-        this.myScore = 0;
     }
 
 }

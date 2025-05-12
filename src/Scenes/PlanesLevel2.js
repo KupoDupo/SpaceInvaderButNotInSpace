@@ -9,7 +9,10 @@ class PlanesLevel2 extends Phaser.Scene {
         
         this.maxEnemyBullets = 20;
 
-        this.myScore = 700;       // score from last level - should probably store/pass this but if it works it works
+    }
+
+    init(data) {
+        this.myScore = data.score || 0;;
     }
 
     preload() {
@@ -172,7 +175,7 @@ class PlanesLevel2 extends Phaser.Scene {
         this.bulletSpeed = 5;
 
         // update HTML description
-        document.getElementById('description').innerHTML = '<h2>Planes Invader.js</h2><br>A: left // D: right // Space: fire/emit'
+        document.getElementById('description').innerHTML = '<h2>Level 2</h2><br>A: left // D: right // Space: fire/emit'
         // Put score on screen
         my.text.score = this.add.bitmapText(550, 0, "rocketSquare", "Score " + this.myScore);
 
@@ -484,7 +487,7 @@ class PlanesLevel2 extends Phaser.Scene {
     }
 
     nextLevel() {
-        this.scene.start("level3");
+        this.scene.start("level3", { score: this.myScore });
     }
 
     gameOver() {
@@ -509,7 +512,6 @@ class PlanesLevel2 extends Phaser.Scene {
 
         this.scene.start("gameOver", { score: this.myScore });
 
-        this.myScore = 0;
     }
 
 }

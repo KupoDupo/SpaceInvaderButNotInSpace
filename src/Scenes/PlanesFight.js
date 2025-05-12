@@ -21,9 +21,10 @@ class PlanesFight extends Phaser.Scene {
         this.maxBullets = 20;           // Don't create more than this many bullets
         
         this.maxEnemyBullets = 20;
+    }
 
-        this.myScore = 0;       // record a score as a class variable
-        // More typically want to use a global variable for score to use across multiple Scenes but okay here
+    init() {
+        this.myScore = 0;
     }
 
     preload() {
@@ -90,6 +91,7 @@ class PlanesFight extends Phaser.Scene {
     create() {
         let my = this.my;
 
+        this.myScore = 0;
         //Initializing Arrays
         this.my.sprite.enemy_bullet = []; 
         this.my.sprite.bullet = []; 
@@ -181,7 +183,7 @@ class PlanesFight extends Phaser.Scene {
         this.bulletSpeed = 5;
 
         // update HTML description
-        document.getElementById('description').innerHTML = '<h2>Planes Invader.js</h2><br>A: left // D: right // Space: fire/emit'
+        document.getElementById('description').innerHTML = '<h2>Level 1</h2><br>A: left // D: right // Space: fire/emit'
         // Put score on screen
         my.text.score = this.add.bitmapText(550, 0, "rocketSquare", "Score " + this.myScore);
 
@@ -419,7 +421,7 @@ class PlanesFight extends Phaser.Scene {
     }
 
     nextLevel() {
-        this.scene.start("level2");
+        this.scene.start("level2", { score: this.myScore });
     }
 
     gameOver() {
@@ -450,7 +452,6 @@ class PlanesFight extends Phaser.Scene {
         // this.gameOverContainer.setVisible(true);
         this.scene.start("gameOver", { score: this.myScore });
 
-        this.myScore = 0;
     }
 
 }
